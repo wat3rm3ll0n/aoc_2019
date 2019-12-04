@@ -1,0 +1,60 @@
+---
+title: "AOC_Day_1"
+author: "Tyler"
+date: "December 3, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+here::here("aoc_day1")
+```
+
+# Part 1
+
+```{r}
+input <- read_tsv("input.txt", col_names = FALSE)
+
+input <- input %>%
+  rename(mass = "X1")
+```
+
+```{r}
+total_fuel_req <- input %>%
+  mutate(fuel = floor(mass/3) - 2) %>%
+  summarise(fuel_total = sum(fuel)) %>%
+  unlist()
+```
+
+# Part 2
+
+```{r}
+fuel_calc <- function(x) {
+  fuel <- floor(x/3) - 2 
+  return(fuel)
+}
+
+fuel_recursion <- function(x) {
+  y <- list()
+  i <- 1
+  y[[i]] <- fuel_calc(x)
+  while(y[[i]] >= 8){
+    i <- i + 1
+    y[[i]] <- fuel_calc(y[[i-1]])
+  }
+  return(y)
+}
+
+total_fuel_req_recursive <- input %>%
+  mutate(fuel = map(.$mass, fuel_recursion)) %>%
+  mutate(fuel_sum = map_depth(.$fuel, 1, reduce, `+`) %>% unlist()) %>%
+  summarise(fuel_total = sum(fuel_sum)) %>%
+  unlist()
+```
