@@ -1,5 +1,5 @@
 ---
-title: "AOC_Day_1"
+title: "Advent of Christmas: Day 1"
 author: "Tyler"
 date: "December 3, 2019"
 output: html_document
@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(tidyverse)
+library(microbenchmark)
 ```
 
 ```{r}
@@ -52,9 +53,36 @@ fuel_recursion <- function(x) {
   return(y)
 }
 
+fuel_recursion_js <- function(x) {
+  y <- fuel_calc(x)
+  z <- y
+  while(z >= 8){
+    z <- fuel_calc(z)
+    y <- y + z
+  }
+  return(y)
+}
+
 total_fuel_req_recursive <- input %>%
   mutate(fuel = map(.$mass, fuel_recursion)) %>%
   mutate(fuel_sum = map_depth(.$fuel, 1, reduce, `+`) %>% unlist()) %>%
   summarise(fuel_total = sum(fuel_sum)) %>%
   unlist()
+
+total_fuel_req_recursive_js <- input %>%
+  mutate(fuel = map(.$mass, fuel_recursion_js) %>% unlist()) %>%
+  summarise(fuel_total = sum(fuel)) %>%
+  unlist()
+
+microbenchmark(
+input %>%
+  mutate(fuel = map(.$mass, fuel_recursion_js) %>% unlist()) %>%
+  summarise(fuel_total = sum(fuel)) %>%
+  unlist(),
+input %>%
+  mutate(fuel = map(.$mass, fuel_recursion)) %>%
+  mutate(fuel_sum = map_depth(.$fuel, 1, reduce, `+`) %>% unlist()) %>%
+  summarise(fuel_total = sum(fuel_sum)) %>%
+  unlist()
+)
 ```
