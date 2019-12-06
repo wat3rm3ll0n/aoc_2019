@@ -1,0 +1,19 @@
+---
+title: "Advent of Christmas: Day 2"
+author: "Tyler"
+date: "December 3, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+here::here("aoc_day2")
+```
+
+```{r}
+
+```
