@@ -14,6 +14,50 @@ library(tidyverse)
 here::here("aoc_day2")
 ```
 
-```{r}
+# Part 1
 
+```{r}
+int_code <- scan("input.txt", sep=',', what = "integer", quiet = TRUE) %>%
+  as.numeric()
+```
+
+```{r}
+int_code_comp <- function(x, noun, verb){
+  x[2] <- noun
+  x[3] <- verb
+  chunks <- split(x, ceiling(seq_along(x)/4))
+  for(chunk in chunks){
+    stopifnot(chunk[1] %in% c(1, 2, 99))
+    if(chunk[1] == 99) {
+      return(list(value = chunks[[1]][1], noun = noun, verb = verb))
+    } else if(chunk[1] == 1){
+      chunks[[ifelse(ceiling(chunk[4]/4) == 0, 1, ceiling(chunk[4]/4))]][ifelse(chunk[4] %% 4 + 1 == 0, 4, chunk[4] %% 4 + 1)] <- 
+        chunks[[ifelse(ceiling(chunk[2]/4) == 0, 1, ceiling(chunk[2]/4))]][ifelse(chunk[2] %% 4 + 1 == 0, 4, chunk[2] %% 4 + 1)] + 
+        chunks[[ifelse(ceiling(chunk[3]/4) == 0, 1, ceiling(chunk[3]/4))]][ifelse(chunk[3] %% 4 + 1 == 0, 4, chunk[3] %% 4 + 1)]
+    } else {
+      chunks[[ifelse(ceiling(chunk[4]/4) == 0, 1, ceiling(chunk[4]/4))]][ifelse(chunk[4] %% 4 + 1 == 0, 4, chunk[4] %% 4 + 1)] <- 
+        chunks[[ifelse(ceiling(chunk[2]/4) == 0, 1, ceiling(chunk[2]/4))]][ifelse(chunk[2] %% 4 + 1 == 0, 4, chunk[2] %% 4 + 1)] * 
+        chunks[[ifelse(ceiling(chunk[3]/4) == 0, 1, ceiling(chunk[3]/4))]][ifelse(chunk[3] %% 4 + 1 == 0, 4, chunk[3] %% 4 + 1)]
+    }
+  }
+}
+
+int_code_comp(int_code, 12, 2)
+```
+
+# Part 2
+
+```{r}
+nouns <- 0:99
+verbs <- 0:99
+
+combos <- expand_grid(nouns, verbs) %>% map(unlist)
+
+vals <- map2_dfr(combos$nouns, combos$verbs, ~int_code_comp(int_code, .x, .y))
+
+vals %>% 
+  filter(value == 19690720) %>% 
+  mutate(answer = 100 * noun + verb) %>%
+  select(answer) %>%
+  unlist()
 ```
